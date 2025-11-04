@@ -30,7 +30,7 @@ def get_content(soup):
 
 def main():
     soup = get_soup(SITE)
-    section = get_section("Quest Stages", soup)
+    section = get_section("", soup)
     print(section)
     return
 

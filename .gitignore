@@ -1,2 +1,3 @@
 .python-version
 test.html
+__pycache__/

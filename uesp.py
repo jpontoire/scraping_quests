@@ -6,10 +6,27 @@ from urllib.parse import urljoin
 from minet.web import request, create_pool_manager, Response
 from minet.scrape import WonderfulSoup, Tag
 
-from utils import get_soup, get_html, construct_url, get_section
+from utils import get_soup, get_html, construct_url
 
 
 MAIN_GAMES = ["Online", "Skyrim", "Oblivion", "Morrowind", "Daggerfall", "Arena"]
+
+SITE = "https://en.uesp.net"
+
+def get_section(title, soup):
+    """Retourne le contenu HTML entre <h2>title</h2> et le <h2> suivant"""
+    section = soup.find("span", {"class": "mw-headline"}, string=title)
+    if not section:
+        return None
+
+    h2 = section.find_parent("h2")
+
+    content = []
+    for sibling in h2.find_next_siblings():
+        if sibling.name == "h2":
+            break
+        content.append(str(sibling.get_text()))
+    return "\n".join(content).strip()
 
 def get_quest_link_by_game(game):
     return f"https://en.uesp.net/wiki/Category:{game}-Quests"
@@ -20,7 +37,7 @@ def get_quests_from_soup(soup):
 def get_next_page_link(soup):
     next_page = soup.scrape_one("a:contains('next page')", "href")
     if next_page:
-        return construct_url(next_page)
+        return construct_url(SITE, next_page)
     return None
 
 def get_quests_pages(game):
@@ -30,7 +47,7 @@ def get_quests_pages(game):
     for page_url in pages:
         soup = get_soup(page_url)
         for quest in get_quests_from_soup(soup):
-            quests.append(construct_url(quest))
+            quests.append(construct_url(SITE, quest))
         next_page = get_next_page_link(soup)
         if next_page:
             pages.append(next_page)
