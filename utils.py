@@ -21,4 +21,6 @@ def get_html(url):
         f.write(str(soup))
     return
 
-
+def remove_fragment(link):
+    """Supprime le fragment d'une URL (la partie après #)"""
+    return link.split("#")[0]
